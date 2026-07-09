@@ -20,7 +20,11 @@ const authen = require('./middlewares/authenticateMiddleware');
 const db = require('./config/config');
 
 app.use(cors({
-  origin: "http://localhost:3000"
+  origin: [
+    "http://localhost:3000",
+    "https://fe-ssmfilm.vercel.app"
+  ],
+  credentials: true
 }));
 app.use(compression());
 // Method override for PUT and DELETE
