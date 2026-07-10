@@ -1,75 +1,120 @@
-require('dotenv').config();
-const dns = require('dns');
-dns.setServers(['8.8.8.8', '1.1.1.1']);
-const express = require('express');
-const app = express();
+require("dotenv").config();
+
+const dns = require("dns");
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
+
+const express = require("express");
 const compression = require("compression");
-const cors = require('cors');
-const port = process.env.PORT || 3001;
-const path = require('path');
-const expressLayouts = require('express-ejs-layouts');
-const session = require('express-session')
-var cookieParser = require('cookie-parser')
-var methodOverride = require('method-override')
+const cors = require("cors");
+const session = require("express-session");
+const cookieParser = require("cookie-parser");
+const methodOverride = require("method-override");
+const expressLayouts = require("express-ejs-layouts");
+const path = require("path");
 
-const route = require('./routes');
-const categoryMiddleware = require('./middlewares/categoryMiddleware')
-const countryMiddleware = require('./middlewares/countryMiddleware')
-const toast = require('./middlewares/toastMiddleware');
-const authen = require('./middlewares/authenticateMiddleware');
-const db = require('./config/config');
+const route = require("./routes");
+const db = require("./config/config");
 
-app.use(cors({
-  origin: [
-    "http://localhost:3000",
-    "https://fe-ssmfilm.vercel.app"
-  ],
-  credentials: true
-}));
-app.use(compression());
-// Method override for PUT and DELETE
-app.use(methodOverride('_method'))
-// Session
-app.set('trust proxy', 1) // trust first proxy
-app.use(session({
-  secret: 'keyboard cat',
-  resave: false,
-  saveUninitialized: false,
-  cookie: { secure: false }
-}))
+// Middlewares
+const categoryMiddleware = require("./middlewares/categoryMiddleware");
+const countryMiddleware = require("./middlewares/countryMiddleware");
+const toast = require("./middlewares/toastMiddleware");
+const authen = require("./middlewares/authenticateMiddleware");
 
-// Cookie parser
-app.use(cookieParser());
+const app = express();
+const port = process.env.PORT || 5000;
 
-// Connect to DB
+/* ===========================
+   Database
+=========================== */
+
 db.connectDB();
 
-// Middleware to parse JSON and URL-encoded data
+/* ===========================
+   Global Middlewares
+=========================== */
+
+// CORS
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://fe-ssmfilm.vercel.app",
+    ],
+    credentials: true,
+  })
+);
+
+// Gzip Compression
+app.use(compression());
+
+// Hỗ trợ PUT, DELETE trong form
+app.use(methodOverride("_method"));
+
+// Parse request body
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Static files
+// Cookie
+app.use(cookieParser());
+
+/* ===========================
+   Session
+=========================== */
+
+app.set("trust proxy", 1);
+
 app.use(
-    express.static(path.join(__dirname, "public"), {
-        maxAge: "30d",
-        etag: true,
-        lastModified: true
-    })
+  session({
+    secret: "keyboard cat",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false,
+    },
+  })
 );
 
-// Template engine
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'resources', 'views'));
-app.use(expressLayouts);
-app.set('layout', 'layouts/main');
+/* ===========================
+   Static Files
+=========================== */
 
-// Custom middlewares
-app.use(categoryMiddleware)
-app.use(countryMiddleware)
+app.use(
+  express.static(path.join(__dirname, "public"), {
+    maxAge: "30d",
+    etag: true,
+    lastModified: true,
+  })
+);
+
+/* ===========================
+   View Engine
+=========================== */
+
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "resources", "views"));
+
+app.use(expressLayouts);
+app.set("layout", "layouts/main");
+
+/* ===========================
+   Custom Middlewares
+=========================== */
+
+app.use(categoryMiddleware);
+app.use(countryMiddleware);
 app.use(toast);
 app.use(authen);
 
+/* ===========================
+   Routes
+=========================== */
+
 route(app);
+
+/* ===========================
+   Start Server
+=========================== */
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
