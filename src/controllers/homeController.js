@@ -201,45 +201,111 @@ class homeController{
     }
 }
 
-    // async register(req, res) {
-    //     try {
-    //         const userData = req.body;
-    //         // Hash the password before saving
-    //         userData.password = await bcrypt.hash(userData.password, 10);
-    //         const user = new userModel(userData);
-    //         await user.save();
-    //         req.session.successMessage = 'Đăng ký thành công!';
-    //         req.session.openModal = true;
-    //         res.redirect('/');
-    //     } catch (error) {
-    //         if (error.code === 11000) {
-    //             req.session.errorMessage = 'Email đã được sử dụng, vui lòng thử lại!';
-    //             req.session.openModalRegister = true;
-    //             res.redirect('/');
-    //         }
-    //     }
-    // }
+    async register(req, res) {
+        try {
+            const { username, email, password } = req.body;
 
-    // async login(req, res) {
-    //     try {
-    //         const userLogin = req.body;
+            const existedUser = await userModel.findOne({ email });
 
-    //         const user = await userModel.findOne({ 
-    //             email: userLogin.email
-    //         });
-    //         if(user && await bcrypt.compare(userLogin.password, user.password)) {
-    //             const token = jwt.sign({
-    //                 id: user._id
-    //             }, process.env.JWT_SECRET, { expiresIn: '1d' });
-    //             return res.json({ token })
-    //         } else {
-    //             return res.status(200).json({ error: 'Email hoặc mật khẩu không đúng' });
-    //         }
-    //     } catch (error) {
-    //         console.error('Login error:', error);
-    //         return res.status(500).render('pages/error', { error: 'Lỗi khi đăng nhập' });
-    //     }
-    // }
+            if (existedUser) {
+            return res.status(400).json({
+                success: false,
+                message: "Email đã được sử dụng.",
+            });
+            }
+
+            const hashPassword = await bcrypt.hash(password, 10);
+
+            const user = await userModel.create({
+            username,
+            email,
+            password: hashPassword,
+            });
+
+            res.status(201).json({
+            success: true,
+            message: "Đăng ký thành công.",
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+            },
+            });
+        } catch (error) {
+            console.log(error);
+
+            res.status(500).json({
+            success: false,
+            message: "Đã xảy ra lỗi máy chủ.",
+            });
+        }
+        }
+
+    async login(req, res) {
+        try {
+            const { email, password } = req.body;
+
+            // Kiểm tra dữ liệu
+            if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: "Vui lòng nhập email và mật khẩu.",
+            });
+            }
+
+            // Tìm user
+            const user = await userModel.findOne({ email });
+
+            if (!user) {
+            return res.status(400).json({
+                success: false,
+                message: "Email hoặc mật khẩu không đúng.",
+            });
+            }
+
+            // So sánh mật khẩu
+            const isMatch = await bcrypt.compare(password, user.password);
+
+            if (!isMatch) {
+            return res.status(400).json({
+                success: false,
+                message: "Mật khẩu không đúng.",
+            });
+            }
+
+            // Tạo JWT
+            const token = jwt.sign(
+                {
+                    id: user._id,
+                    role: user.role,
+                },
+                process.env.JWT_SECRET,
+                {
+                    expiresIn: "1d",
+                }
+            );
+
+            return res.status(200).json({
+            success: true,
+            message: "Đăng nhập thành công.",
+            token,
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                role: user.role,
+                avatar: user.avatar,
+            },
+            });
+        } catch (error) {
+            console.error("Login error:", error);
+
+            return res.status(500).json({
+            success: false,
+            message: "Lỗi máy chủ.",
+            });
+        }
+        }
 
     // async logout(req, res) {
     //     try {

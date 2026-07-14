@@ -22,9 +22,9 @@ router.get('/movie/:slug', homeController.detail)
 
 router.get('/watch/:slug', homeController.watchFilm);
 
-// router.post('/register', homeController.register);
+router.post('/register', homeController.register);
 
-// router.post('/login', homeController.login);
+router.post('/login', homeController.login);
 
 // router.post('/logout', homeController.logout);
 
