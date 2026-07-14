@@ -39,7 +39,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://fe-ssmfilm.vercel.app",
+      "https://ssmfilm.vercel.app",
     ],
     credentials: true,
   })
