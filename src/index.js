@@ -16,9 +16,6 @@ const route = require("./routes");
 const db = require("./config/config");
 
 // Middlewares
-const categoryMiddleware = require("./middlewares/categoryMiddleware");
-const countryMiddleware = require("./middlewares/countryMiddleware");
-const toast = require("./middlewares/toastMiddleware");
 const authen = require("./middlewares/authenticateMiddleware");
 
 const app = express();
@@ -101,9 +98,6 @@ app.set("layout", "layouts/main");
    Custom Middlewares
 =========================== */
 
-app.use(categoryMiddleware);
-app.use(countryMiddleware);
-app.use(toast);
 app.use(authen);
 
 /* ===========================

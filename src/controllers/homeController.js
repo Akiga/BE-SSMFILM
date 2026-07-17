@@ -1,8 +1,5 @@
 const { getPhimList, getPhimDetail, getChuDe, getFilmCategory, getCountryCategory, search, getCategory, getCountry} = require('../services/phimService');
 const userModel = require('../models/users');
-const filmModel = require('../models/filmed');
-const favoriteModel = require('../models/favorite');
-const guestModel = require('../models/filmForGuest');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
@@ -299,24 +296,12 @@ class homeController{
             });
         } catch (error) {
             console.error("Login error:", error);
-
             return res.status(500).json({
             success: false,
             message: "Lỗi máy chủ.",
             });
         }
         }
-
-    // async logout(req, res) {
-    //     try {
-    //         res.clearCookie('token');
-    //         res.redirect('/');
-    //     } catch (error) {
-    //         console.error('Logout error:', error);
-    //         res.status(500).render('pages/error', { error: 'Lỗi khi đăng xuất' });
-    //     }
-    // }
-
 }
 
 module.exports = new homeController;

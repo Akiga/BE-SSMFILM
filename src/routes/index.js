@@ -1,11 +1,8 @@
 const homeRouter = require('./home')
-const personalRouter = require('./personal');
-const adminRouter = require('./admin');
-const isAdmin = require('../middlewares/isAdminMiddleware')
+const favoriteRouter = require('./favorite')
 function route(app) {
   app.use('/', homeRouter);
-  // app.use('/personal', personalRouter);
-  // app.use('/admin', isAdmin, adminRouter);
+  app.use('/favorites', favoriteRouter)
 }
 
 module.exports = route;
