@@ -1,5 +1,6 @@
 const { getPhimList, getPhimDetail, getChuDe, getFilmCategory, getCountryCategory, search, getCategory, getCountry} = require('../services/phimService');
 const userModel = require('../models/users');
+const historyModel = require("../models/history");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
@@ -302,6 +303,91 @@ class homeController{
             });
         }
         }
+
+    async addHistory(req, res) {
+        try {
+            const { slug, name, poster, episode } = req.body;
+            const userId = req.user.id;
+
+            const existed = await historyModel.findOne({
+                userId,
+                slug,
+            });
+
+            if (existed) {
+                existed.episode = episode;
+                existed.watchedAt = new Date();
+
+                await existed.save();
+
+                return res.json({
+                    success: true,
+                    message: "Đã cập nhật lịch sử",
+                });
+            }
+
+            await historyModel.create({
+                userId,
+                slug,
+                name,
+                poster,
+                episode,
+            });
+
+            res.json({
+                success: true,
+                message: "Đã thêm lịch sử",
+            });
+        } catch (err) {
+            res.status(500).json({
+                success: false,
+                message: err.message,
+            });
+        }
+    }
+
+    async getHistory(req, res) {
+        try {
+            const userId = req.user.id;
+
+            const histories = await historyModel
+                .find({ userId })
+                .sort({ watchedAt: -1 });
+
+            res.json({
+                success: true,
+                histories,
+            });
+        } catch (err) {
+            res.status(500).json({
+                success: false,
+                message: err.message,
+            });
+        }
+    }
+
+    async removeHistory(req, res) {
+        try {
+            const userId = req.user.id;
+            const { slug } = req.params;
+
+            await historyModel.deleteOne({
+                userId,
+                slug,
+            });
+
+            res.json({
+                success: true,
+                message: "Đã xóa",
+            });
+        } catch (err) {
+            res.status(500).json({
+                success: false,
+                message: err.message,
+            });
+        }
+    }
 }
+    
 
 module.exports = new homeController;

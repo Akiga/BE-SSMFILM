@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const homeController = require('../controllers/homeController')
+const authApi = require('../middlewares/authApi')
 
 router.get('/', homeController.home);
 
@@ -25,6 +26,12 @@ router.get('/watch/:slug', homeController.watchFilm);
 router.post('/register', homeController.register);
 
 router.post('/login', homeController.login);
+
+router.post("/history", authApi, homeController.addHistory);
+
+router.get("/history", authApi, homeController.getHistory);
+
+router.delete("/history/:slug", authApi, homeController.removeHistory);
 
 
 
