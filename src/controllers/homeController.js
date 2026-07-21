@@ -302,7 +302,7 @@ class homeController{
             message: "Lỗi máy chủ.",
             });
         }
-        }
+    }
 
     async addHistory(req, res) {
         try {
