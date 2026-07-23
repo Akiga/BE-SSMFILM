@@ -7,4 +7,6 @@ router.get("/", authApi, profileController.getProfile);
 
 router.put("/", authApi, profileController.updateProfile);
 
+router.put("/password", authApi, profileController.changePassword);
+
 module.exports = router
