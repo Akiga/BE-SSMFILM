@@ -28,6 +28,11 @@ const historySchema = new mongoose.Schema(
         default: "",
     },
 
+    currentTime: {
+        type: Number,
+        default: 0,
+    },
+
     watchedAt: {
         type: Date,
         default: Date.now,

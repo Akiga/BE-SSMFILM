@@ -3,7 +3,9 @@ const router = express.Router()
 const homeController = require('../controllers/homeController')
 const authApi = require('../middlewares/authApi')
 
-router.get('/', homeController.home);
+router.get('/', homeController.firstPage);
+
+router.get('/home', homeController.home);
 
 router.get("/categories", homeController.getCategories);
 

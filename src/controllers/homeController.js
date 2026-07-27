@@ -38,6 +38,12 @@ class homeController{
         }
 }
 
+    async firstPage (req, res){
+        res.json({
+            message: 'Chào mừng bạn đến với trang xem phim'
+        })
+    }
+
     // Trang chủ
     async home(req, res) {
     try {
