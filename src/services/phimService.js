@@ -11,12 +11,15 @@ async function getPhimList(Page = 1) {
   }
 }
 
-async function getPhimDetail(slug){
-  try{
-    const res = await axios.get(`${process.env.MOVIE_API_BASE_URL}/phim/${slug}`)
-    return res.data
-  }catch(error){
-    console.log('Lấy chi tiết phim thất bại', error)
+async function getPhimDetail(slug) {
+  try {
+    const res = await axios.get(
+      `${process.env.MOVIE_API_BASE_URL}/phim/${slug}`
+    );
+    return res.data;
+  } catch (error) {
+    console.log("Lấy chi tiết phim thất bại", slug);
+    return null;
   }
 }
 
